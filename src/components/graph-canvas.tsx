@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ReactFlow, { Background, Edge, Node, NodeTypes } from "reactflow";
 import "reactflow/dist/style.css";
 import PlaylistNode from "@/components/PlaylistNode";
@@ -17,10 +17,13 @@ export default function GraphCanvas() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Define which React component to render for each node type
-  const nodeTypes: NodeTypes = {
-    playlist: PlaylistNode,
-    song: SongNode,
-  };
+  const nodeTypes = useMemo<NodeTypes>(
+    () => ({
+      playlist: PlaylistNode,
+      song: SongNode,
+    }),
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -62,6 +65,8 @@ export default function GraphCanvas() {
           id: e.id,
           source: e.source,
           target: e.target,
+          sourceHandle: e.sourceHandle,
+          targetHandle: e.targetHandle,
         }));
 
         setNodes(rfNodes);

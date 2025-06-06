@@ -20,6 +20,8 @@ export type Edge = {
   id: string;
   source: string;
   target: string;
+  sourceHandle: string;
+  targetHandle: string;
 };
 
 // Layout constants for a simple grid to avoid overlapping nodes
@@ -145,6 +147,8 @@ export async function buildGraph(
         id: `${plId}-${trackId}`,
         source: plId,
         target: trackId,
+        sourceHandle: "playlist-source",
+        targetHandle: "song-target",
       });
     });
 
