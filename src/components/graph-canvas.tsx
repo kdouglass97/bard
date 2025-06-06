@@ -48,18 +48,18 @@ export default function GraphCanvas() {
           credentials: "include",
         });
         console.timeEnd("🔄 fetch /api/spotify/graph");
-  
+
         console.time("📦 parse JSON");
         const data = await res.json();
         console.timeEnd("📦 parse JSON");
-  
+
         // If the server returned an error key, log it and bail out.
         if (data.error) {
           console.error("❌ /api/spotify/graph error:", data.error);
           setIsLoading(false);
           return;
         }
-  
+
         if (!Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
           console.error("Unexpected /api/spotify/graph response:", data);
           setIsLoading(false);
@@ -114,7 +114,6 @@ export default function GraphCanvas() {
       }
     })();
   }, []);
-
 
   if (isLoading) {
     return (
@@ -178,7 +177,9 @@ export default function GraphCanvas() {
 
   const onDrag: NodeDragHandler = (_, node) => {
     setNodes((nds) => {
-      const updated = nds.map((n) => (n.id === node.id ? { ...n, position: node.position } : { ...n }));
+      const updated = nds.map((n) =>
+        n.id === node.id ? { ...n, position: node.position } : { ...n }
+      );
       const moving = updated.find((n) => n.id === node.id)!;
       resolveCollision(moving, updated);
       return updated;
