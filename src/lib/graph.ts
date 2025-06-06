@@ -22,9 +22,21 @@ export type Edge = {
   target: string;
 };
 
-// Simple random position in an 800×800 box
-function randomPosition() {
-  return { x: Math.random() * 800, y: Math.random() * 800 };
+// Layout constants for a simple grid to avoid overlapping nodes
+const PLAYLIST_SPACING_X = 220;
+const SONG_SPACING_X = 220;
+const SONG_SPACING_Y = 120;
+const SONG_START_Y = 200;
+
+// Deterministic positions for playlists and songs so they don't overlap
+function playlistPosition(index: number) {
+  return { x: index * PLAYLIST_SPACING_X, y: 0 };
+}
+
+function songPosition(index: number, playlistCount: number) {
+  const row = Math.floor(index / playlistCount);
+  const col = index % playlistCount;
+  return { x: col * SONG_SPACING_X, y: SONG_START_Y + row * SONG_SPACING_Y };
 }
 
 /**
@@ -93,8 +105,8 @@ export async function buildGraph(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  // 3a) One node per playlist, with its cover image
-  playlists.forEach((pl) => {
+  // 3a) One node per playlist, with its cover image and deterministic position
+  playlists.forEach((pl, index) => {
     const coverUrl = pl.images[0]?.url;
     nodes.push({
       id: pl.id,
@@ -105,11 +117,12 @@ export async function buildGraph(
       },
       type: "playlist",
       style: { width: 180 },
-      position: randomPosition(),
+      position: playlistPosition(index),
     });
   });
 
   // 3b) One node per song (only those in ≥ minPlaylists playlists)
+  let songIndex = 0;
   songToPlaylists.forEach((playlistSet, trackId) => {
     if (playlistSet.size < minPlaylists) return;
 
@@ -123,7 +136,7 @@ export async function buildGraph(
       },
       type: "song",
       style: { width: 60 + playlistSet.size * 8 },
-      position: randomPosition(),
+      position: songPosition(songIndex, playlists.length),
     });
 
     // 3c) Edges from each playlist → this song
@@ -134,6 +147,8 @@ export async function buildGraph(
         target: trackId,
       });
     });
+
+    songIndex++;
   });
 
   return { nodes, edges };
