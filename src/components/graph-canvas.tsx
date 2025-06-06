@@ -19,6 +19,12 @@ import "reactflow/dist/style.css";
 import PlaylistNode from "@/components/PlaylistNode";
 import SongNode from "@/components/SongNode";
 
+// Stable mapping for React Flow node types
+const NODE_TYPES: NodeTypes = {
+  playlist: PlaylistNode,
+  song: SongNode,
+};
+
 // Helper for random (x,y) — replace later with a real layout
 function randomPosition() {
   return { x: Math.random() * 800, y: Math.random() * 800 };
@@ -32,13 +38,7 @@ export default function GraphCanvas() {
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
 
   // Define which React component to render for each node type
-  const nodeTypes = useMemo<NodeTypes>(
-    () => ({
-      playlist: PlaylistNode,
-      song: SongNode,
-    }),
-    []
-  );
+  const nodeTypes = NODE_TYPES;
 
   useEffect(() => {
     (async () => {
@@ -116,14 +116,6 @@ export default function GraphCanvas() {
   }, []);
 
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500" />
-        <span className="ml-4 text-gray-700">Building your playlist graph…</span>
-      </div>
-    );
-  }
 
   // Highlight logic for hover spotlight
   const displayNodes = useMemo(() => {
@@ -196,25 +188,32 @@ export default function GraphCanvas() {
 
   return (
     <div className="h-screen w-full">
-      <ReactFlow
-        nodes={displayNodes}
-        edges={displayEdges}
-        nodeTypes={nodeTypes}
-        onNodeMouseEnter={onNodeEnter}
-        onNodeMouseLeave={onNodeLeave}
-        onNodeDrag={onDrag}
-        onInit={onInit}
-        fitView
-        proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{
-          animated: false,
-          style: { stroke: "rgba(220,220,220,0.6)", strokeWidth: 1 },
-        }}
-        panOnDrag
-        zoomOnScroll
-      >
-        <Background variant="dots" gap={16} size={1} />
-      </ReactFlow>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500" />
+          <span className="ml-4 text-gray-700">Building your playlist graph…</span>
+        </div>
+      ) : (
+        <ReactFlow
+          nodes={displayNodes}
+          edges={displayEdges}
+          nodeTypes={nodeTypes}
+          onNodeMouseEnter={onNodeEnter}
+          onNodeMouseLeave={onNodeLeave}
+          onNodeDrag={onDrag}
+          onInit={onInit}
+          fitView
+          proOptions={{ hideAttribution: true }}
+          defaultEdgeOptions={{
+            animated: false,
+            style: { stroke: "rgba(220,220,220,0.6)", strokeWidth: 1 },
+          }}
+          panOnDrag
+          zoomOnScroll
+        >
+          <Background variant="dots" gap={16} size={1} />
+        </ReactFlow>
+      )}
     </div>
   );
 }
