@@ -19,11 +19,6 @@ import "reactflow/dist/style.css";
 import PlaylistNode from "@/components/PlaylistNode";
 import SongNode from "@/components/SongNode";
 
-const nodeTypes: NodeTypes = {
-  playlist: PlaylistNode,
-  song: SongNode,
-};
-
 // Helper for random (x,y) — replace later with a real layout
 function randomPosition() {
   return { x: Math.random() * 800, y: Math.random() * 800 };
@@ -36,7 +31,14 @@ export default function GraphCanvas() {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
 
-  // nodeTypes are defined outside the component so React Flow sees stable refs
+  // Define which React component to render for each node type
+  const nodeTypes = useMemo<NodeTypes>(
+    () => ({
+      playlist: PlaylistNode,
+      song: SongNode,
+    }),
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -46,18 +48,18 @@ export default function GraphCanvas() {
           credentials: "include",
         });
         console.timeEnd("🔄 fetch /api/spotify/graph");
-  
+
         console.time("📦 parse JSON");
         const data = await res.json();
         console.timeEnd("📦 parse JSON");
-  
+
         // If the server returned an error key, log it and bail out.
         if (data.error) {
           console.error("❌ /api/spotify/graph error:", data.error);
           setIsLoading(false);
           return;
         }
-  
+
         if (!Array.isArray(data.nodes) || !Array.isArray(data.edges)) {
           console.error("Unexpected /api/spotify/graph response:", data);
           setIsLoading(false);
@@ -113,7 +115,14 @@ export default function GraphCanvas() {
     })();
   }, []);
 
-
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500" />
+        <span className="ml-4 text-gray-700">Building your playlist graph…</span>
+      </div>
+    );
+  }
 
   // Highlight logic for hover spotlight
   const displayNodes = useMemo(() => {
@@ -168,7 +177,9 @@ export default function GraphCanvas() {
 
   const onDrag: NodeDragHandler = (_, node) => {
     setNodes((nds) => {
-      const updated = nds.map((n) => (n.id === node.id ? { ...n, position: node.position } : { ...n }));
+      const updated = nds.map((n) =>
+        n.id === node.id ? { ...n, position: node.position } : { ...n }
+      );
       const moving = updated.find((n) => n.id === node.id)!;
       resolveCollision(moving, updated);
       return updated;
@@ -183,15 +194,6 @@ export default function GraphCanvas() {
   useEffect(() => {
     rfInstance?.fitView();
   }, [rfInstance, nodes]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500" />
-        <span className="ml-4 text-gray-700">Building your playlist graph…</span>
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen w-full">
