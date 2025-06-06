@@ -1,10 +1,12 @@
 // src/components/SongNode.tsx
-import { NodeProps } from "reactflow";
+import { NodeProps, Handle, Position } from "reactflow";
 
 export default function SongNode({ data }: NodeProps) {
   return (
-    <div className="flex items-center bg-white border border-gray-300 rounded-md shadow p-1"
-         style={{ minWidth: 100 }}>
+    <div
+      className="flex items-center bg-white border border-gray-300 rounded-md shadow p-1"
+      style={{ minWidth: 100 }}
+    >
       {data.image ? (
         <img src={data.image} alt="Album art" className="h-10 w-10 object-cover rounded-sm" />
       ) : (
@@ -13,6 +15,8 @@ export default function SongNode({ data }: NodeProps) {
         </div>
       )}
       <div className="ml-2 text-xs font-normal text-gray-800">{data.label}</div>
+      {/* Target handle for edges coming into this song */}
+      <Handle type="target" position={Position.Top} id="song-target" />
     </div>
   );
 }

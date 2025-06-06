@@ -1,5 +1,5 @@
 // src/components/PlaylistNode.tsx
-import { NodeProps } from "reactflow";
+import { NodeProps, Handle, Position } from "reactflow";
 
 export default function PlaylistNode({ data }: NodeProps) {
   return (
@@ -12,6 +12,8 @@ export default function PlaylistNode({ data }: NodeProps) {
         </div>
       )}
       <div className="mt-2 text-sm font-medium text-gray-800">{data.label}</div>
+      {/* Source handle for edges from this playlist */}
+      <Handle type="source" position={Position.Bottom} id="playlist-source" />
     </div>
   );
 }
