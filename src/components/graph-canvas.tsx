@@ -47,8 +47,26 @@ export default function GraphCanvas() {
           setIsLoading(false);
           return;
         }
-  
-        // … map data.nodes & data.edges to rfNodes/rfEdges as before …
+
+        // Map the plain JSON nodes/edges returned from the API into the shape
+        // expected by React Flow and store them in state.
+        const rfNodes: Node[] = data.nodes.map((n: any) => ({
+          id: n.id,
+          type: n.type,
+          data: n.data,
+          position: n.position ?? randomPosition(),
+          style: n.style,
+        }));
+
+        const rfEdges: Edge[] = data.edges.map((e: any) => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+        }));
+
+        setNodes(rfNodes);
+        setEdges(rfEdges);
+        setIsLoading(false);
       } catch (fetchError) {
         console.error("Error fetching /api/spotify/graph:", fetchError);
         setIsLoading(false);
