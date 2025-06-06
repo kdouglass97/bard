@@ -1,13 +1,20 @@
 // src/components/PlaylistNode.tsx
 import { NodeProps, Handle, Position } from "reactflow";
 
-export default function PlaylistNode({ data }: NodeProps) {
+export default function PlaylistNode({ data, style }: NodeProps) {
   return (
-    <div className="flex flex-col items-center bg-white border border-gray-300 rounded-md shadow-md p-2 w-44">
+    <div
+      className="flex flex-col items-center bg-white border border-gray-300 rounded-md shadow-md p-2"
+      style={style}
+    >
       {data.image ? (
-        <img src={data.image} alt="Playlist cover" className="h-24 w-full object-cover rounded-md" />
+        <img
+          src={data.image}
+          alt="Playlist cover"
+          className="w-full aspect-square object-cover rounded-md"
+        />
       ) : (
-        <div className="h-24 w-full bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+        <div className="w-full aspect-square bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
           No Image
         </div>
       )}
