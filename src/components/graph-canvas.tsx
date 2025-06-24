@@ -36,9 +36,20 @@ export default function GraphCanvas() {
   const [isLoading, setIsLoading] = useState(true);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+  const [aiMessage, setAiMessage] = useState<string>("");
 
   // Define which React component to render for each node type
   const nodeTypes = NODE_TYPES;
+
+  const fetchJoke = async () => {
+    try {
+      const res = await fetch("/api/joke");
+      const data = await res.json();
+      if (data.text) setAiMessage(data.text);
+    } catch (err) {
+      console.error("/api/joke error", err);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -187,7 +198,20 @@ export default function GraphCanvas() {
   }, [rfInstance, nodes]);
 
   return (
-    <div className="h-screen w-full">
+    <div className="relative h-screen w-full">
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end space-y-2">
+        <button
+          onClick={fetchJoke}
+          className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
+        >
+          Get Joke
+        </button>
+        {aiMessage && (
+          <div className="bg-white dark:bg-gray-800 text-sm p-2 rounded shadow max-w-xs">
+            {aiMessage}
+          </div>
+        )}
+      </div>
       {isLoading ? (
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500" />
