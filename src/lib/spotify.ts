@@ -47,3 +47,24 @@ export async function fetchAllPlaylists(
 
   return playlists;
 }
+
+/**
+ * Fetch the user's recently played tracks from Spotify.
+ */
+export async function fetchRecentTracks(
+  req: NextRequest,
+  limit = 20
+): Promise<SpotifyApi.PlayHistoryObject[]> {
+  const accessToken = await getSpotifyToken(req);
+  const url = `${SPOTIFY_API}/me/player/recently-played?limit=${limit}`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) {
+    throw new Error(
+      `Spotify recent tracks fetch failed: ${res.status} ${res.statusText}`
+    );
+  }
+  const data = (await res.json()) as SpotifyApi.UsersRecentlyPlayedTracksResponse;
+  return data.items;
+}
