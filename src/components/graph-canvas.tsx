@@ -41,17 +41,13 @@ export default function GraphCanvas() {
   // Define which React component to render for each node type
   const nodeTypes = NODE_TYPES;
 
-  const askGraphFact = async () => {
+  const askListeningFeedback = async () => {
     try {
-      const res = await fetch("/api/graph-fact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nodes, edges }),
-      });
+      const res = await fetch("/api/listening-feedback");
       const data = await res.json();
       if (data.text) setAiMessage(data.text);
     } catch (err) {
-      console.error("/api/graph-fact error", err);
+      console.error("/api/listening-feedback error", err);
     }
   };
 
@@ -205,7 +201,7 @@ export default function GraphCanvas() {
     <div className="relative h-screen w-full">
       <div className="absolute top-4 right-4 z-10 flex flex-col items-end space-y-2">
         <button
-          onClick={askGraphFact}
+          onClick={askListeningFeedback}
           className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
         >
           Ask AI
