@@ -1,5 +1,5 @@
 // src/auth.ts
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import type { JWT } from "next-auth/jwt";
 
@@ -42,8 +42,8 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
   }
 }
 
-// This is the “handler” that Next.js will call for any auth request
-const handler = NextAuth({
+// Export the configuration separately so it can be used by `getServerSession`
+export const authOptions: NextAuthOptions = {
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
@@ -90,7 +90,10 @@ const handler = NextAuth({
       return session;
     },
   },
-});
+};
+
+// This is the handler that Next.js will call for any auth request
+const handler = NextAuth(authOptions);
 
 // Export the handler as both GET and POST so Next.js can route requests correctly
 export { handler as GET, handler as POST };
