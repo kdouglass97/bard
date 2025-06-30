@@ -41,13 +41,17 @@ export default function GraphCanvas() {
   // Define which React component to render for each node type
   const nodeTypes = NODE_TYPES;
 
-  const fetchJoke = async () => {
+  const askGraphFact = async () => {
     try {
-      const res = await fetch("/api/joke");
+      const res = await fetch("/api/graph-fact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nodes, edges }),
+      });
       const data = await res.json();
       if (data.text) setAiMessage(data.text);
     } catch (err) {
-      console.error("/api/joke error", err);
+      console.error("/api/graph-fact error", err);
     }
   };
 
@@ -201,10 +205,10 @@ export default function GraphCanvas() {
     <div className="relative h-screen w-full">
       <div className="absolute top-4 right-4 z-10 flex flex-col items-end space-y-2">
         <button
-          onClick={fetchJoke}
+          onClick={askGraphFact}
           className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
         >
-          Get Joke
+          Ask AI
         </button>
         {aiMessage && (
           <div className="bg-white dark:bg-gray-800 text-sm p-2 rounded shadow max-w-xs">
